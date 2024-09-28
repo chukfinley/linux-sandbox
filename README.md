@@ -16,3 +16,4 @@ sudo apt-get install libgtk-3-dev
 - Audio
 - Scaling
 - Network
+- Vm reset
