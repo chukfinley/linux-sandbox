@@ -24,13 +24,13 @@ fn main() {
             }
         });
 
-        vbox.append(&label);
-        vbox.append(&button);
-        window.set_child(Some(&vbox));
-        window.show();
+        vbox.pack_start(&label, false, false, 0);
+        vbox.pack_start(&button, false, false, 0);
+        window.add(&vbox);
+        window.show_all();
     });
 
-    app.run();
+    app.run(&[]);
 }
 
 fn is_debian_based() -> bool {
