@@ -17,3 +17,6 @@ sudo apt-get install libgtk-3-dev
 - Scaling
 - Network
 - Vm reset
+
+# TODO
+- Vm shutdown on close
