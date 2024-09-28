@@ -54,7 +54,7 @@ fn install_quickemu() {
     if output.status.success() {
         std::process::Command::new("sh")
             .arg("-c")
-            .arg("sudo dpkg -i /tmp/quickemu.deb")
+            .arg("pkexec dpkg -i /tmp/quickemu.deb")
             .output()
             .expect("Failed to install Quickemu");
     } else {
