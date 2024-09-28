@@ -17,7 +17,28 @@ fn main() {
 
         button.connect_clicked(|_| {
             if is_debian_based() {
-                install_quickemu();
+                let sandbox_dir = format!(
+                    "{}/.local/share/linux-sandbox",
+                    std::env::var("HOME").unwrap()
+                );
+                let vm_conf = format!("{}/linuxmint-21.3-cinnamon.conf", sandbox_dir);
+
+                if !std::path::Path::new(&vm_conf).exists() {
+                    install_quickemu();
+                    if !std::path::Path::new(&sandbox_dir).exists() {
+                        std::fs::create_dir_all(&sandbox_dir)
+                            .expect("Failed to create sandbox directory");
+                    }
+                    std::process::Command::new("sh")
+                        .arg("-c")
+                        .arg(format!(
+                            "cd {} && quickget linuxmint 21.3 cinnamon",
+                            sandbox_dir
+                        ))
+                        .output()
+                        .expect("Failed to get Linux Mint VM");
+                }
+
                 setup_and_run_vm();
             } else {
                 eprintln!("This script only supports Debian-based systems.");
@@ -67,21 +88,6 @@ fn setup_and_run_vm() {
         "{}/.local/share/linux-sandbox",
         std::env::var("HOME").unwrap()
     );
-    if !std::path::Path::new(&sandbox_dir).exists() {
-        std::fs::create_dir_all(&sandbox_dir).expect("Failed to create sandbox directory");
-    }
-
-    let vm_conf = format!("{}/linuxmint-21.3-cinnamon.conf", sandbox_dir);
-    if !std::path::Path::new(&vm_conf).exists() {
-        std::process::Command::new("sh")
-            .arg("-c")
-            .arg(format!(
-                "cd {} && quickget linuxmint 21.3 cinnamon",
-                sandbox_dir
-            ))
-            .output()
-            .expect("Failed to get Linux Mint VM");
-    }
 
     std::process::Command::new("sh")
         .arg("-c")
