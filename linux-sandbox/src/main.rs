@@ -1,27 +1,19 @@
+use gio::prelude::*; // Import the necessary traits
 use gtk::prelude::*;
-use gtk::{Application, ApplicationWindow, Box, Button, Label, Orientation};
-use std::fs;
-use std::path::Path;
-use std::process::Command;
+use gtk::{Application, ApplicationWindow, Button, Label};
 
 fn main() {
-    let app = Application::builder()
-        .application_id("com.example.quickemu-installer")
-        .build();
+    let app = Application::new(Some("com.example.quickemu-installer"), Default::default())
+        .expect("Failed to initialize GTK.");
 
     app.connect_activate(|app| {
-        let window = ApplicationWindow::builder()
-            .application(app)
-            .title("Quickemu Installer")
-            .default_width(350)
-            .default_height(70)
-            .build();
+        let window = ApplicationWindow::new(app);
+        window.set_title("Quickemu Installer");
+        window.set_default_size(350, 70);
 
         let vbox = gtk::Box::new(gtk::Orientation::Vertical, 5);
-        let label = Label::builder()
-            .label("Click the button to install and run Quickemu")
-            .build();
-        let button = Button::builder().label("Install and Run").build();
+        let label = Label::new(Some("Click the button to install and run Quickemu"));
+        let button = Button::with_label("Install and Run");
 
         button.connect_clicked(|_| {
             if is_debian_based() {
@@ -42,7 +34,7 @@ fn main() {
 }
 
 fn is_debian_based() -> bool {
-    let output = Command::new("sh")
+    let output = std::process::Command::new("sh")
         .arg("-c")
         .arg("cat /etc/os-release | grep 'ID_LIKE=debian'")
         .output()
@@ -53,14 +45,14 @@ fn is_debian_based() -> bool {
 
 fn install_quickemu() {
     let url = "https://github.com/quickemu-project/quickemu/releases/download/4.9.6/quickemu_4.9.6-1_all.deb";
-    let output = Command::new("sh")
+    let output = std::process::Command::new("sh")
         .arg("-c")
         .arg(format!("wget {} -O /tmp/quickemu.deb", url))
         .output()
         .expect("Failed to download Quickemu");
 
     if output.status.success() {
-        Command::new("sh")
+        std::process::Command::new("sh")
             .arg("-c")
             .arg("sudo dpkg -i /tmp/quickemu.deb")
             .output()
@@ -75,13 +67,13 @@ fn setup_and_run_vm() {
         "{}/.local/share/linux-sandbox",
         std::env::var("HOME").unwrap()
     );
-    if !Path::new(&sandbox_dir).exists() {
-        fs::create_dir_all(&sandbox_dir).expect("Failed to create sandbox directory");
+    if !std::path::Path::new(&sandbox_dir).exists() {
+        std::fs::create_dir_all(&sandbox_dir).expect("Failed to create sandbox directory");
     }
 
     let vm_conf = format!("{}/linuxmint-21.3-cinnamon.conf", sandbox_dir);
-    if !Path::new(&vm_conf).exists() {
-        Command::new("sh")
+    if !std::path::Path::new(&vm_conf).exists() {
+        std::process::Command::new("sh")
             .arg("-c")
             .arg(format!(
                 "cd {} && quickget linuxmint 21.3 cinnamon",
@@ -91,7 +83,7 @@ fn setup_and_run_vm() {
             .expect("Failed to get Linux Mint VM");
     }
 
-    Command::new("sh")
+    std::process::Command::new("sh")
         .arg("-c")
         .arg(format!(
             "cd {} && quickemu --vm linuxmint-21.3-cinnamon.conf --viewer none --display spice --access local --spice-port 5999 --public-dir ~/Public --status-quo",
@@ -100,7 +92,7 @@ fn setup_and_run_vm() {
         .output()
         .expect("Failed to run VM");
 
-    Command::new("sh")
+    std::process::Command::new("sh")
         .arg("-c")
         .arg("remote-viewer spice://localhost:5999")
         .output()
