@@ -36,7 +36,7 @@ fn main() {
 fn is_debian_based() -> bool {
     let output = std::process::Command::new("sh")
         .arg("-c")
-        .arg("cat /etc/os-release | grep 'ID_LIKE=debian'")
+        .arg("cat /etc/os-release | grep 'ID_LIKE=\"ubuntu debian\"'")
         .output()
         .expect("Failed to execute command");
 
