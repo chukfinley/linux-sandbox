@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Toggle Shared Folder Mount
+Comment=Mount or unmount the Public-user 9p shared folder
+Exec=bash -c 'MOUNT_POINT="$HOME/Public"; if mountpoint -q "$MOUNT_POINT"; then pkexec umount "$MOUNT_POINT" && notify-send "Shared Folder Unmounted" "The folder has been unmounted."; else pkexec mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 Public-user "$MOUNT_POINT" && notify-send "Shared Folder Mounted" "The folder has been mounted."; fi'
+Icon=folder-remote
+Terminal=false
+Categories=System;FileTools;
