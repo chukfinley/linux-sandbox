@@ -21,3 +21,4 @@ sudo apt-get install libgtk-3-dev
 # TODO
 - Vm shutdown on close
 - Install Monitoring Apps
+- Install Script
